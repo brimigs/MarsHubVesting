@@ -12,7 +12,7 @@ import { MarsVestingQueryClient } from "./types/generated/mars-vesting/MarsVesti
 import {useMarsVestingPositionQuery} from "./types/generated/mars-vesting/MarsVesting.react-query";
 import {useMarsVestingVotingPowerQuery} from "./types/generated/mars-vesting/MarsVesting.react-query";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { PositionResponse } from "./types/generated/mars-vesting/MarsVesting.types";
+import { PositionResponse, VotingPowerResponse } from "./types/generated/mars-vesting/MarsVesting.types";
 
 export default function Home() {
   const { connect, disconnect } = useWalletManager();
@@ -21,7 +21,9 @@ export default function Home() {
 
       const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
 
-  const [position, setPosition] = useState<PositionResponse>()
+  const [position, setPosition] = useState<PositionResponse>();
+
+  const [voting, setVoting] = useState<VotingPowerResponse>();
 
   const [userBalance, setUserBalance] = useState<string | undefined>();
 
@@ -29,22 +31,18 @@ export default function Home() {
 
   const vestingAddress = "mars14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9smxjtde";
 
-  const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress)
+  const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress);
 
   const queryPosition = async () => {
-    //thi sline
     if (!address) return 
-    //come here
-    // before assings position, it's waiting.
     const positionResponse = await client.position({user: address})
-    console.log(positionResponse)
-    // continues here after request received
     setPosition(positionResponse)
   } ;
 
   const queryVotingPower = async () => {
     if (!address) return 
-    await client.votingPower({user: address})
+    const votingResponse = await client.votingPower({user: address})
+    setVoting(votingResponse)
   };
 
   const rm = BigNumber.ROUND_HALF_CEIL;
@@ -89,39 +87,35 @@ export default function Home() {
         <main className={styles.main}>
           {isConnected ? (
               <>
-                <button onClick={queryPosition}>Fetch position</button>
-                <p>{`User Balance: ${lookup(
+                <h4>{`Wallet: ${address}`}</h4>
+                <p>{`Balance: ${lookup(
                     Number(userBalance) || 0,
                     chainInfo?.stakeCurrency?.coinDenom || "",
                     chainInfo?.stakeCurrency?.coinDecimals || 6
                 )} MARS`}
                 </p>
 
+                <button onClick={queryPosition}>Get Vested Position</button>
+                <br/> 
+                {/* <button onClick={queryVotingPower}>Get Voting Power</button> */}
+
                 <br/>
                 
                 {position && <ul>
-                  <li>total: {position.total}</li>
-                  <li>unlocked: {position.unlocked}</li>
-                  <li>user: {position.user}</li>
-                  <li>vest_schedule: {JSON.stringify(position.vest_schedule)}</li>
+                  <li>Total Vested Tokens: {(position.total as any/1000000)} MARS</li>
+                  <li>Unlocked: {position.unlocked} MARS</li>
+                  {/* <li>vest_schedule: {JSON.stringify(position.vest_schedule)}</li> */}
                   <li>vested: {position.vested}</li>
-                  <li>withdrawable: {position.withdrawable}</li>
-                  <li>withdrawn: {position.withdrawn}</li>
+                  <li>Withdrawable: {position.withdrawable} MARS</li>
+                  <li>Withdrawn: {position.withdrawn} MARS</li>
                 </ul>}
-                {/* <p>{`Vested Position: ${lookup(
-                    Number(position) || 0,
-                    chainInfo?.stakeCurrency?.coinDenom || "",
-                    chainInfo?.stakeCurrency?.coinDecimals || 6
-                )} MARS`}
-                </p>
-                <br/>
-                <p> {`Voting Power: ${lookup(
-                    Number(queryVotingPower) || 0,
-                    chainInfo?.stakeCurrency?.coinDenom || "",
-                    chainInfo?.stakeCurrency?.coinDecimals || 6
-                )} MARS`}
-                </p> */}
-                {/*<button onClick={executeMesssage}>Execute</button>*/}
+
+                <br/> 
+
+                {voting && <ul>
+                  <li>Voting Power: {voting.voting_power} </li>
+                </ul>
+                }
                 <br/>
                 <button onClick={disconnect}>{`Disconnect ${name}`}</button>{" "}
               </>

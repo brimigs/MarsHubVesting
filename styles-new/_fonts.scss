@@ -1,8 +1,10 @@
+@use '../styles/master' as *;
+
 @font-face {
   font-family: Inter;
   src: url('../fonts/Inter-ExtraLight.woff2') format('woff2'),
     url('../fonts/Inter-ExtraLight.woff') format('woff');
-  font-weight: 300;
+  font-weight: $fontWeightLight;
   font-style: normal;
   font-display: swap;
 }
@@ -11,7 +13,7 @@
   font-family: Inter;
   src: url('../fonts/Inter-Regular.woff2') format('woff2'),
     url('../fonts/Inter-Regular.woff') format('woff');
-  font-weight: 400;
+  font-weight: $fontWeightRegular;
   font-style: normal;
   font-display: swap;
 }
@@ -20,49 +22,37 @@
   font-family: Inter;
   src: url('../fonts/Inter-SemiBold.woff2') format('woff2'),
     url('../fonts/Inter-SemiBold.woff') format('woff');
-  font-weight: 600;
+  font-weight: $fontWeightSemibold;
   font-style: normal;
   font-display: swap;
 }
 
-
 html,
 body {
-  padding: 0;
-  margin: 0;
   font-family: Inter, sans-serif;
-  font-weight: 400;
+  font-weight: $fontWeightRegular;
   font-style: normal;
-  font-size: 15px;
+  font-size: $rem-base;
   line-height: space(6);
-  color: white;
-}
-
-h1 {
-  letter-spacing: 0.8rem;
-  font-family: Inter, sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 30px;
-  /* line-height: space(6); */
-  color: white;
+  color: $fontColorLightPrimary;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+  color: $fontColorLightPrimary;
+
+  &:hover,
+  &:focus,
+  &:active {
+    text-decoration: none;
+  }
 }
 
-* {
-  box-sizing: border-box;
+b,
+strong {
+  font-weight: $fontWeightSemibold;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+p {
+  @include typoL;
+  margin: 0 0 space(8);
 }

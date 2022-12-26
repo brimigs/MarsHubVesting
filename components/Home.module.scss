@@ -1,0 +1,71 @@
+@use '../styles/master' as *;
+
+.home {
+  color: $fontColorLightPrimary;
+  width: 100%;
+  @include margin(0, 0, 30);
+
+  .button {
+    display: flex;
+    justify-content: center;
+  }
+
+  .intro {
+    @include margin(0, 0, 18);
+
+    h1 {
+      @include typoH2caps;
+      text-align: center;
+      @include margin(0, 0, 9);
+
+      span {
+        display: block;
+        @include typoH1caps;
+        @include margin(2, 0, 0);
+      }
+    }
+
+    p {
+      &:first-of-type {
+        &:first-letter {
+          float: left;
+          font-size: rem-calc(55);
+          line-height: rem-calc(38);
+          @include padding(2, 1.5, 0, 0);
+        }
+      }
+    }
+  }
+
+  .app {
+    @include margin(0, 0, 18);
+
+    h2 {
+      @include typoH1caps;
+      text-align: center;
+      @include margin(0, 0, 9);
+    }
+  }
+}
+
+@media only screen and (min-width: $bpMediumLow) {
+  .home {
+    .intro {
+      @include margin(0, 0, 22);
+
+      h1 {
+        @include typoH2capsDesktop;
+        @include margin(0, 0, 22);
+      }
+    }
+
+    .app {
+      @include margin(0, 0, 22);
+
+      h2 {
+        @include typoH1capsDesktop;
+        @include margin(0, 0, 22);
+      }
+    }
+  }
+}

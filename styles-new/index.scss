@@ -1,0 +1,32 @@
+@use './master' as *;
+@use './fonts' as *;
+@use-normalize;
+
+* {
+  box-sizing: border-box;
+  @include padding(0);
+  @include margin(0);
+}
+
+html {
+  scrollbar-width: none;
+  background: $backgroundBody;
+}
+
+body {
+  cursor: default;
+  background: $backgroundBody;
+  background-size: auto 100%;
+  background-image: url('/images/bg.svg');
+  background-position: center top;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+@media only screen and (min-width: $bpMediumLow) {
+  body {
+    background-size: 100% auto;
+  }
+}

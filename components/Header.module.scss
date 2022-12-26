@@ -1,0 +1,27 @@
+@use '../styles/master' as *;
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: space(10) 0 space(12);
+  flex: 0 0 100%;
+  width: 100%;
+
+  svg {
+    width: rem-calc(110);
+    height: rem-calc(110);
+    transition: width 0.5s, height 0.5s;
+  }
+}
+
+@media only screen and (min-width: $bpDesktopLow) {
+  .header {
+    padding: space(50) 0 space(12);
+
+    svg {
+      width: rem-calc(210);
+      height: rem-calc(210);
+    }
+  }
+}

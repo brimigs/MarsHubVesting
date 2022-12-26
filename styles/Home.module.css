@@ -27,31 +27,53 @@
 }
 
 .button { 
-  /* transition: background-color 0.2s, border 0.2s; */
+  transition: background-color 0.2s, border 0.2s;
   color: white;
   appearance: none;
   border: none;
-  border-radius: rem-calc(16);
+  border-radius: 0.8rem;
   cursor: pointer;
   outline: none;
   align-items: center;
   word-wrap: normal;
   word-break: normal;
-  min-width: rem-calc(240);
-  color: #14a693;
+  min-width: 15rem;
   text-decoration: none;
   display: flex;
   align-items: center;
   display: inline-block;
-  width: rem-calc(18);
-  height: rem-calc(18);
+  padding: 1rem;
   font-family: Inter, sans-serif;
   font-weight: 400;
   font-style: normal;
   font-size: 15px;
   line-height: space(6);
-  color: white;
+  background-color: #14a693;
+}
 
+.button2 { 
+  transition: background-color 0.2s, border 0.2s;
+  color: white;
+  appearance: none;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  outline: none;
+  align-items: center;
+  word-wrap: normal;
+  word-break: normal;
+  min-width: 5rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  display: inline-block;
+  padding: 1rem;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 15px;
+  line-height: space(6);
+  background-color: #14a693;
 }
 
 .footer {

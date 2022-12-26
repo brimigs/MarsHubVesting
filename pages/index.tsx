@@ -12,7 +12,6 @@ import { MarsVestingQueryClient } from "./types/generated/mars-vesting/MarsVesti
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 import { PositionResponse, VotingPowerResponse } from "./types/generated/mars-vesting/MarsVesting.types";
 import React from 'react'
-import { calculateFee } from "@cosmjs/stargate";
 
 interface Props {
   color?: string
@@ -35,10 +34,10 @@ export const LogoSVG = ({ color = '#FFFFFF' }: Props) => {
 
 export default function Home() {
   const { connect, disconnect } = useWalletManager();
-  const { status, signingCosmWasmClient, name, chainInfo } =
+  const { status, signingCosmWasmClient, name, chainInfo, address } =
       useWallet();
 
-      const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
+      // const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
 
   const [position, setPosition] = useState<PositionResponse>();
 
@@ -129,10 +128,13 @@ export default function Home() {
                 {position && <ul>
                   <li>Total Vested Tokens: {(position.total as any/1000000)} MARS</li>
                   <li>Unlocked: {position.unlocked} MARS</li>
-                  {/* <li>vest_schedule: {JSON.stringify(position.vest_schedule)}</li> */}
-                  <li>vested: {position.vested}</li>
                   <li>Withdrawable: {position.withdrawable} MARS</li>
                   <li>Withdrawn: {position.withdrawn} MARS</li>
+                  <br/>
+                  Vesting Schedule: 
+                  <li>Start Time: {position.vest_schedule.start_time}</li>
+                  <li>Cliff: {position.vest_schedule.cliff}</li>
+                  <li>Duration: {position.vest_schedule.duration}</li>
                 </ul>}
 
                 <br/> 
@@ -142,7 +144,7 @@ export default function Home() {
                 </ul>
                 }
                 <br/>
-                <button className={styles.button} onClick={disconnect}>{`Disconnect ${name}`}</button>{" "}
+                <button className={styles.button2} onClick={disconnect}>Disconnect</button>{" "}
               </>
           ) : (
               <button className={styles.button} onClick={connect}>Connect Wallet</button>

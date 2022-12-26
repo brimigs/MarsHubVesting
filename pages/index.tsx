@@ -1,16 +1,15 @@
 import {
   useWalletManager,
   useWallet,
-  fetchBalances,
   WalletConnectionStatus,
 } from "@marsprotocol/wallet-connector";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "../styles/Home.module.css";
 import BigNumber from "bignumber.js";
-import { MarsVestingQueryClient } from "./types/generated/mars-vesting/MarsVesting.client";
+import { MarsVestingQueryClient } from "../mars-vesting/MarsVesting.client";
 import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { PositionResponse, VotingPowerResponse } from "./types/generated/mars-vesting/MarsVesting.types";
+import { PositionResponse, VotingPowerResponse } from "../mars-vesting/MarsVesting.types";
 import React from 'react'
 
 interface Props {
@@ -57,11 +56,11 @@ export default function Home() {
     setPosition(positionResponse)
   } ;
 
-  const queryVotingPower = async () => {
-    if (!address) return 
-    const votingResponse = await client.votingPower({user: address})
-    setVoting(votingResponse)
-  };
+  // const queryVotingPower = async () => {
+  //   if (!address) return 
+  //   const votingResponse = await client.votingPower({user: address})
+  //   setVoting(votingResponse)
+  // };
 
   const rm = BigNumber.ROUND_HALF_CEIL;
 
@@ -76,23 +75,23 @@ export default function Home() {
     return value.dp(dp(decimals, symbol), rm).toNumber();
   };
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      const userBalances = await fetchBalances(
-          address || "",
-          chainInfo?.chainId
-      );
+  // useEffect(() => {
+  //   const interval = setInterval(async () => {
+  //     const userBalances = await fetchBalances(
+  //         address || "",
+  //         chainInfo?.chainId
+  //     );
 
-      if (userBalances && userBalances.balances?.length) {
-        setUserBalance(userBalances.balances[0].amount);
-      } else {
-        if (!userBalance) {
-          setUserBalance("0");
-        }
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [address, userBalance]);
+  //     if (userBalances && userBalances.balances?.length) {
+  //       setUserBalance(userBalances.balances[0].amount);
+  //     } else {
+  //       if (!userBalance) {
+  //         setUserBalance("0");
+  //       }
+  //     }
+  //   }, 3000);
+  //   return () => clearInterval(interval);
+  // }, [address, userBalance]);
 
   return (
       <div className={styles.container}>

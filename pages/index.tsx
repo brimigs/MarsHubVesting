@@ -51,11 +51,18 @@ export default function Home() {
   const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress);
 
   const queryPosition = async () => {
-    if (!address) return 
-    const positionResponse = await client.position({user: address})
-    setPosition(positionResponse)
+    try { 
+      if (!address) return 
+      const positionResponse = await client.position({user: address})
+      setPosition(positionResponse)
+    } catch (e) { 
+      console.log('No Vesting Position Associated with this wallet. Try Connecting a new wallet')
+      var message = 'No Vesting Position Associated with this wallet. Try Connecting a new wallet' ;
+      alert(message);
+      return true;
+    }
   } ;
-
+  
   // const queryVotingPower = async () => {
   //   if (!address) return 
   //   const votingResponse = await client.votingPower({user: address})
@@ -123,7 +130,7 @@ export default function Home() {
                 {/* <button onClick={queryVotingPower}>Get Voting Power</button> */}
 
                 <br/>
-                
+              
                 {position && <ul>
                   <li>Total Vested Tokens: {(position.total as any/1000000)} MARS</li>
                   <li>Unlocked: {position.unlocked} MARS</li>

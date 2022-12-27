@@ -132,7 +132,8 @@ export default function Home() {
                 <br/>
               
                 {position && <ul>
-                  <li>Total Vested Tokens: {(position.total as any/1000000)} MARS</li>
+                  <li>Total Token Allocation: {(position.total as any/1000000)} MARS</li>
+                  <li>Total Vested: {(position.vested as any/1000000)} MARS</li>
                   <li>Unlocked: {position.unlocked} MARS</li>
                   <li>Withdrawable: {position.withdrawable} MARS</li>
                   <li>Withdrawn: {position.withdrawn} MARS</li>

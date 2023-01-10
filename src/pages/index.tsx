@@ -1,16 +1,13 @@
-import {
-  useWalletManager,
-  useWallet,
-  WalletConnectionStatus,
-} from "@marsprotocol/wallet-connector";
-import Head from "next/head";
-import { useState } from "react";
-import styles from "../styles/Home.module.css";
-import BigNumber from "bignumber.js";
-import { MarsVestingQueryClient } from "../mars-vesting/MarsVesting.client";
-import { CosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { PositionResponse, VotingPowerResponse } from "../mars-vesting/MarsVesting.types";
-import React from 'react'
+import { useWallet, useWalletManager, WalletConnectionStatus } from '@marsprotocol/wallet-connector'
+import Head from 'next/head'
+import { useState } from 'react'
+
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import BigNumber from 'bignumber.js'
+import moment from 'moment'
+import { formatValue } from '../helper/parse'
+import { MarsVestingQueryClient } from '../mars-vesting/MarsVesting.client'
+import { PositionResponse, VotingPowerResponse } from '../mars-vesting/MarsVesting.types'
 
 interface Props {
   color?: string
@@ -20,7 +17,13 @@ interface Props {
 
 export const LogoSVG = ({ color = '#FFFFFF' }: Props) => {
   return (
-    <svg width={110} height={110} viewBox='0 0 287 287' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <svg
+      width={110}
+      height={110}
+      viewBox='0 0 287 287'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
       <path
         fillRule='evenodd'
         clipRule='evenodd'
@@ -32,55 +35,52 @@ export const LogoSVG = ({ color = '#FFFFFF' }: Props) => {
 }
 
 export default function Home() {
-  const { connect, disconnect } = useWalletManager();
-  const { status, signingCosmWasmClient, name, chainInfo, address } =
-      useWallet();
+  const { connect, disconnect } = useWalletManager()
+  const { status, signingCosmWasmClient, name, chainInfo, address } = useWallet()
 
-      // const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
+  // const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
 
-  const [position, setPosition] = useState<PositionResponse>();
+  const [position, setPosition] = useState<PositionResponse>()
 
-  const [voting, setVoting] = useState<VotingPowerResponse>();
+  const [voting, setVoting] = useState<VotingPowerResponse>()
 
-  const [userBalance, setUserBalance] = useState<string | undefined>();
+  const [userBalance, setUserBalance] = useState<string | undefined>()
 
-  const isConnected = status === WalletConnectionStatus.Connected;
+  const isConnected = status === WalletConnectionStatus.Connected
 
-  const vestingAddress = "mars14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9smxjtde";
+  const vestingAddress = 'mars14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9smxjtde'
 
-  const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress);
+  const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress)
 
   const queryPosition = async () => {
-    try { 
-      if (!address) return 
-      const positionResponse = await client.position({user: address})
+    try {
+      if (!address) return
+      const positionResponse = await client.position({ user: address })
       setPosition(positionResponse)
-    } catch (e) { 
+    } catch (e) {
       console.log('No Vesting Position Associated with this wallet. Try Connecting a new wallet')
-      var message = 'No Vesting Position Associated with this wallet. Try Connecting a new wallet' ;
-      alert(message);
-      return true;
+      var message = 'No Vesting Position Associated with this wallet. Try Connecting a new wallet'
+      alert(message)
+      return true
     }
-  } ;
-  
+  }
+
   // const queryVotingPower = async () => {
-  //   if (!address) return 
+  //   if (!address) return
   //   const votingResponse = await client.votingPower({user: address})
   //   setVoting(votingResponse)
   // };
 
-  const rm = BigNumber.ROUND_HALF_CEIL;
+  const rm = BigNumber.ROUND_HALF_CEIL
 
   const dp = (decimals: number, symbol?: string): number =>
-      !symbol || symbol === "uusd" ? 2 : decimals;
+    !symbol || symbol === 'uusd' ? 2 : decimals
 
   const lookup = (amount: number, symbol: string, decimals: number): number => {
-    const value = symbol
-        ? new BigNumber(amount).div(10 ** decimals)
-        : new BigNumber(amount);
+    const value = symbol ? new BigNumber(amount).div(10 ** decimals) : new BigNumber(amount)
 
-    return value.dp(dp(decimals, symbol), rm).toNumber();
-  };
+    return value.dp(dp(decimals, symbol), rm).toNumber()
+  }
 
   // useEffect(() => {
   //   const interval = setInterval(async () => {
@@ -101,63 +101,137 @@ export default function Home() {
   // }, [address, userBalance]);
 
   return (
-      <div className={styles.container}>
-        <Head>
-          <title>Mars Hub Vested Tokens</title>
-          <meta name="This UI allows you to query you vested token position and unlocked schedule for the connect wallet" content="Generated by Mars Protocol" />
-          <link rel="icon" href="/favicon.svg" />
-        </Head>
+    <div className='container'>
+      <Head>
+        <title>Mars Hub Vested Tokens</title>
+        <meta
+          name='This UI allows you to query you vested token position and unlocked schedule for the connect wallet'
+          content='Generated by Mars Protocol'
+        />
+        <link rel='icon' href='/favicon.svg' />
+      </Head>
 
-        <header className={styles.header}> 
-          <LogoSVG/>
-          <br/> 
-          <h1>MARS PROTOCOL </h1>
-        </header>
+      <header className='header'>
+        <LogoSVG />
+        <br />
+        <h1>MARS PROTOCOL </h1>
+      </header>
 
-        <main className={styles.main}>
-          {isConnected ? (
-              <>
-                <h4>{`Connected Wallet: ${address}`}</h4>
-                <p>{`Balance: ${lookup(
-                    Number(userBalance) || 0,
-                    chainInfo?.stakeCurrency?.coinDenom || "",
-                    chainInfo?.stakeCurrency?.coinDecimals || 6
-                )} MARS`}
-                </p>
-
-                <button className={styles.button} onClick={queryPosition}>Get Vested Position</button>
-                <br/> 
-                {/* <button onClick={queryVotingPower}>Get Voting Power</button> */}
-
-                <br/>
-              
-                {position && <ul>
-                  <li>Total Token Allocation: {(position.total as any/1000000)} MARS</li>
-                  <li>Total Vested: {(position.vested as any/1000000)} MARS</li>
-                  <li>Unlocked: {position.unlocked} MARS</li>
-                  <li>Withdrawable: {position.withdrawable} MARS</li>
-                  <li>Withdrawn: {position.withdrawn} MARS</li>
-                  <br/>
-                  Vesting Schedule: 
-                  <li>Start Time: {position.vest_schedule.start_time}</li>
-                  <li>Cliff: {position.vest_schedule.cliff}</li>
-                  <li>Duration: {position.vest_schedule.duration}</li>
-                </ul>}
-
-                <br/> 
-
-                {voting && <ul>
-                  <li>Voting Power: {voting.voting_power} </li>
-                </ul>
-                }
-                <br/>
-                <button className={styles.button2} onClick={disconnect}>Disconnect</button>{" "}
-              </>
-          ) : (
-              <button className={styles.button} onClick={connect}>Connect Wallet</button>
-          )}
-        </main>
-      </div>
-  );
+      <main className='main'>
+        {isConnected ? (
+          <>
+            <h4>{`Connected Wallet: ${address}`}</h4>
+            <p>
+              {`Balance: ${lookup(
+                Number(userBalance) || 0,
+                chainInfo?.stakeCurrency?.coinDenom || '',
+                chainInfo?.stakeCurrency?.coinDecimals || 6,
+              )} MARS`}
+            </p>
+            <button className='button' onClick={queryPosition}>
+              Get Vested Position
+            </button>
+            <br />
+            {/* <button onClick={queryVotingPower}>Get Voting Power</button> */}
+            <br />
+            {position && (
+              <div className='data'>
+                <dl>
+                  <dt>Total Token Allocation</dt>
+                  <dd>
+                    {formatValue(
+                      (position.total as any) / 1000000,
+                      0,
+                      6,
+                      true,
+                      false,
+                      ' MARS',
+                      false,
+                      false,
+                    )}
+                  </dd>
+                  <dt>Total Vested</dt>
+                  <dd>
+                    {formatValue(
+                      (position.vested as any) / 1000000,
+                      0,
+                      6,
+                      true,
+                      false,
+                      ' MARS',
+                      false,
+                      false,
+                    )}
+                  </dd>
+                  <dt>Unlocked</dt>
+                  <dd>
+                    {formatValue(position.unlocked, 0, 6, true, false, ' MARS', false, false)}
+                  </dd>
+                  <dt>Withdrawable</dt>
+                  <dd>
+                    {formatValue(position.withdrawable, 0, 6, true, false, ' MARS', false, false)}
+                  </dd>
+                  <dt>Withdrawn</dt>
+                  <dd>
+                    {formatValue(position.withdrawn, 0, 6, true, false, ' MARS', false, false)}
+                  </dd>
+                  <dt>Vesting Start Time</dt>
+                  <dd>{moment.unix(position.vest_schedule.start_time).format('MM/DD/YYYY')}</dd>
+                  <dt>Vesting Cliff</dt>
+                  <dd>
+                    {moment
+                      .unix(position.vest_schedule.start_time + position.vest_schedule.cliff)
+                      .format('MM/DD/YYYY')}{' '}
+                    <span className='faded'>
+                      {formatValue(
+                        position.vest_schedule.cliff / 86400,
+                        0,
+                        0,
+                        true,
+                        '(',
+                        ' days)',
+                        true,
+                      )}
+                    </span>
+                  </dd>
+                  <dt>Vesting End</dt>
+                  <dd>
+                    {moment
+                      .unix(position.vest_schedule.start_time + position.vest_schedule.duration)
+                      .format('MM/DD/YYYY')}{' '}
+                    <span className='faded'>
+                      {formatValue(
+                        position.vest_schedule.duration / 86400,
+                        0,
+                        0,
+                        true,
+                        '(',
+                        ' days)',
+                        true,
+                        false,
+                      )}
+                    </span>
+                  </dd>
+                </dl>
+              </div>
+            )}
+            <br />
+            {voting && (
+              <ul>
+                <li>Voting Power: {voting.voting_power} </li>
+              </ul>
+            )}
+            <br />
+            <button className='button2' onClick={disconnect}>
+              Disconnect
+            </button>
+          </>
+        ) : (
+          <button className='button' onClick={connect}>
+            Connect Wallet
+          </button>
+        )}
+      </main>
+    </div>
+  )
 }
-

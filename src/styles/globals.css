@@ -1,3 +1,71 @@
+@font-face {
+  font-family: Inter;
+  src: url('../fonts/Inter-ExtraLight.woff2') format('woff2'),
+    url('../fonts/Inter-ExtraLight.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Inter;
+  src: url('../fonts/Inter-Regular.woff2') format('woff2'),
+    url('../fonts/Inter-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Inter;
+  src: url('../fonts/Inter-SemiBold.woff2') format('woff2'),
+    url('../fonts/Inter-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 15px;
+  line-height: space(6);
+  color: white;
+}
+
+h1 {
+  letter-spacing: 0.8rem;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 30px;
+  /* line-height: space(6); */
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    color: white;
+    background: black;
+  }
+}
+
 .container {
   padding: 0 2rem;
   background-image: url('/images/bg.svg');
@@ -13,7 +81,7 @@
   align-items: center;
 }
 
-.header { 
+.header {
   padding: 40px;
   text-align: center;
   color: white;
@@ -26,7 +94,7 @@
   letter-spacing: rem-calc(12);
 }
 
-.button { 
+.button {
   transition: background-color 0.2s, border 0.2s;
   color: white;
   appearance: none;
@@ -51,7 +119,7 @@
   background-color: #14a693;
 }
 
-.button2 { 
+.button2 {
   transition: background-color 0.2s, border 0.2s;
   color: white;
   appearance: none;
@@ -190,4 +258,36 @@
   .logo img {
     filter: invert(1);
   }
+}
+
+.faded {
+  opacity: 0.4;
+}
+
+.data {
+  display: flex;
+  justify-content: center;
+  flex: 0 0 100%;
+}
+
+dl {
+  display: flex;
+  flex-wrap: wrap;
+  width: auto;
+  width: 50%;
+}
+
+dt,
+dd {
+  width: 50%;
+  padding: 0.5em 0;
+  margin: 0;
+}
+
+dt {
+  padding-right: 1rem;
+  text-align: right;
+  font-weight: bold;
+  clear: left;
+  float: left;
 }

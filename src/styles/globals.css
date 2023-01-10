@@ -69,6 +69,7 @@ a {
 .container {
   padding: 0 2rem;
   background-image: url('/images/bg.svg');
+  background-size: 100% auto;
 }
 
 .main {

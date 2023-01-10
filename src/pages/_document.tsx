@@ -21,7 +21,6 @@ export default function Document() {
         <meta property='og:site_name' content='Mars Protocol' />
         <meta name='msapplication-TileColor' content='#ffffff' />
         <meta name='theme-color' content='#ffffff' />
-        <meta name='terra-webextension' />
       </Head>
       <body>
         <Main />

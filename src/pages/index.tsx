@@ -162,10 +162,10 @@ export default function Home() {
                     {formatValue(position.withdrawn, 0, 6, true, false, ' MARS', false, false)}
                   </dd>
                   <dt>Vesting Start Time</dt>
-                  <dd>{moment.unix(startTime).format('MM/DD/YYYY')}</dd>
+                  <dd>{moment.unix(startTime).format('MMMM Do YYYY')}</dd>
                   <dt>Vesting Cliff</dt>
                   <dd>
-                    {moment.unix(startTime + position.vest_schedule.cliff).format('MM/DD/YYYY')}{' '}
+                    {moment.unix(startTime + position.vest_schedule.cliff).format('MMMM Do YYYY')}{' '}
                     <span className='faded'>
                       {formatValue(
                         position.vest_schedule.cliff / 86400,
@@ -180,7 +180,9 @@ export default function Home() {
                   </dd>
                   <dt>Vesting End</dt>
                   <dd>
-                    {moment.unix(startTime + position.vest_schedule.duration).format('MM/DD/YYYY')}{' '}
+                    {moment
+                      .unix(startTime + position.vest_schedule.duration)
+                      .format('MMMM Do YYYY')}{' '}
                     <span className='faded'>
                       {formatValue(
                         position.vest_schedule.duration / 86400,

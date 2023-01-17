@@ -82,23 +82,9 @@ export default function Home() {
     return value.dp(dp(decimals, symbol), rm).toNumber()
   }
 
-  // useEffect(() => {
-  //   const interval = setInterval(async () => {
-  //     const userBalances = await fetchBalances(
-  //         address || "",
-  //         chainInfo?.chainId
-  //     );
-
-  //     if (userBalances && userBalances.balances?.length) {
-  //       setUserBalance(userBalances.balances[0].amount);
-  //     } else {
-  //       if (!userBalance) {
-  //         setUserBalance("0");
-  //       }
-  //     }
-  //   }, 3000);
-  //   return () => clearInterval(interval);
-  // }, [address, userBalance]);
+  const globalStart = moment('02-01-2023', 'MM-DD-YYYY').unix()
+  const userStart = position?.vest_schedule.start_time ?? 0
+  const startTime = userStart > globalStart ? userStart : globalStart
 
   return (
     <div className='container'>
@@ -176,12 +162,10 @@ export default function Home() {
                     {formatValue(position.withdrawn, 0, 6, true, false, ' MARS', false, false)}
                   </dd>
                   <dt>Vesting Start Time</dt>
-                  <dd>{moment.unix(position.vest_schedule.start_time).format('MM/DD/YYYY')}</dd>
+                  <dd>{moment.unix(startTime).format('MM/DD/YYYY')}</dd>
                   <dt>Vesting Cliff</dt>
                   <dd>
-                    {moment
-                      .unix(position.vest_schedule.start_time + position.vest_schedule.cliff)
-                      .format('MM/DD/YYYY')}{' '}
+                    {moment.unix(startTime + position.vest_schedule.cliff).format('MM/DD/YYYY')}{' '}
                     <span className='faded'>
                       {formatValue(
                         position.vest_schedule.cliff / 86400,
@@ -196,9 +180,7 @@ export default function Home() {
                   </dd>
                   <dt>Vesting End</dt>
                   <dd>
-                    {moment
-                      .unix(position.vest_schedule.start_time + position.vest_schedule.duration)
-                      .format('MM/DD/YYYY')}{' '}
+                    {moment.unix(startTime + position.vest_schedule.duration).format('MM/DD/YYYY')}{' '}
                     <span className='faded'>
                       {formatValue(
                         position.vest_schedule.duration / 86400,

@@ -82,7 +82,7 @@ export default function Home() {
     return value.dp(dp(decimals, symbol), rm).toNumber()
   }
 
-  const globalStart = moment('02-01-2023', 'MM-DD-YYYY').unix()
+  const globalStart = moment('09-01-2023', 'MM-DD-YYYY').unix()
   const userStart = position?.vest_schedule.start_time ?? 0
   const startTime = userStart > globalStart ? userStart : globalStart
 

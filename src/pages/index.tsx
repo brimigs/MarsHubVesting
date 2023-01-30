@@ -139,11 +139,20 @@ export default function Home() {
           <>
             <h4>{`Connected Wallet: ${address}`}</h4>
             <p>
-              {`Balance: ${lookup(
-                Number(userBalance) || 0,
-                chainInfo?.stakeCurrency?.coinDenom || '',
-                chainInfo?.stakeCurrency?.coinDecimals || 6,
-              )} MARS`}
+              {formatValue(
+                lookup(
+                  Number(userBalance) || 0,
+                  chainInfo?.defaultCurrency?.coinDenom || '',
+                  chainInfo?.defaultCurrency?.coinDecimals || 6,
+                ),
+                0,
+                chainInfo?.defaultCurrency?.coinDecimals,
+                true,
+                false,
+                ' MARS',
+                false,
+                false,
+              )}
             </p>
             <button className='button' onClick={queryPosition}>
               Get Vested Position
@@ -159,7 +168,7 @@ export default function Home() {
                     {formatValue(
                       (position.total as any) / 1000000,
                       0,
-                      6,
+                      chainInfo?.defaultCurrency?.coinDecimals,
                       true,
                       false,
                       ' MARS',
@@ -172,7 +181,7 @@ export default function Home() {
                     {formatValue(
                       (allUnlocked ? 0 : (position.vested as any)) / 1000000,
                       0,
-                      6,
+                      chainInfo?.defaultCurrency?.coinDecimals,
                       true,
                       false,
                       ' MARS',
@@ -185,7 +194,7 @@ export default function Home() {
                     {formatValue(
                       allUnlocked ? position.total : position.unlocked,
                       0,
-                      6,
+                      chainInfo?.defaultCurrency?.coinDecimals,
                       true,
                       false,
                       ' MARS',

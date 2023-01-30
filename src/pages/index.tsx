@@ -1,6 +1,12 @@
-import { useWallet, useWalletManager, WalletConnectionStatus } from '@marsprotocol/wallet-connector'
+import {
+  fetchBalances,
+  getClient,
+  useWallet,
+  useWalletManager,
+  WalletConnectionStatus,
+} from '@marsprotocol/wallet-connector'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import BigNumber from 'bignumber.js'
@@ -35,27 +41,53 @@ export const LogoSVG = ({ color = '#FFFFFF' }: Props) => {
 }
 
 export default function Home() {
-  const { connect, disconnect } = useWalletManager()
-  const { status, signingCosmWasmClient, name, chainInfo, address } = useWallet()
+  const { connect, disconnect: terminate, status } = useWalletManager()
+  const { recentWallet, disconnect } = useWallet()
+  const address = recentWallet?.account.address ?? undefined
+  const [client, setClient] = useState<CosmWasmClient | undefined>()
+  const chainInfo = recentWallet?.network
+  const [userBalance, setUserBalance] = useState<string | undefined>()
 
-  // const address = 'mars1hn5gxjz9y02m7h7ngpayfx9rs67jxgm0gj8mhs'
+  useEffect(() => {
+    if (!recentWallet || client) return
+    const getCosmWasmClient = async () => {
+      const cosmClient = await getClient(recentWallet.network.rpc)
+      setClient(cosmClient)
+    }
+
+    getCosmWasmClient()
+  }, [recentWallet?.network.rpc])
+
+  useEffect(() => {
+    if (!address || !chainInfo) return
+    const interval = setInterval(async () => {
+      const userBalances = await fetchBalances(address, chainInfo.chainId)
+
+      if (userBalances && userBalances.balances?.length) {
+        setUserBalance(userBalances.balances[0].amount)
+      } else {
+        if (!userBalance) {
+          setUserBalance('0')
+        }
+      }
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [address, chainInfo?.chainId])
 
   const [position, setPosition] = useState<PositionResponse>()
 
   const [voting, setVoting] = useState<VotingPowerResponse>()
 
-  const [userBalance, setUserBalance] = useState<string | undefined>()
-
   const isConnected = status === WalletConnectionStatus.Connected
 
   const vestingAddress = 'mars14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9smxjtde'
 
-  const client = new MarsVestingQueryClient(signingCosmWasmClient as CosmWasmClient, vestingAddress)
+  const queryClient = new MarsVestingQueryClient(client as CosmWasmClient, vestingAddress)
 
   const queryPosition = async () => {
     try {
-      if (!address) return
-      const positionResponse = await client.position({ user: address })
+      if (!address || !client) return
+      const positionResponse = await queryClient.position({ user: address })
       setPosition(positionResponse)
     } catch (e) {
       console.log('No Vesting Position Associated with this wallet. Try Connecting a new wallet')
@@ -64,12 +96,6 @@ export default function Home() {
       return true
     }
   }
-
-  // const queryVotingPower = async () => {
-  //   if (!address) return
-  //   const votingResponse = await client.votingPower({user: address})
-  //   setVoting(votingResponse)
-  // };
 
   const rm = BigNumber.ROUND_HALF_CEIL
 
@@ -85,6 +111,11 @@ export default function Home() {
   const globalStart = moment('02-01-2023', 'MM-DD-YYYY').unix()
   const userStart = position?.vest_schedule.start_time ?? 0
   const startTime = userStart > globalStart ? userStart : globalStart
+
+  const allUnlocked =
+    position?.vest_schedule.start_time === 0 &&
+    position.vest_schedule.duration === 1 &&
+    position.vest_schedule.cliff === 0
 
   return (
     <div className='container'>
@@ -139,7 +170,7 @@ export default function Home() {
                   <dt>Total Vested</dt>
                   <dd>
                     {formatValue(
-                      (position.vested as any) / 1000000,
+                      (allUnlocked ? 0 : (position.vested as any)) / 1000000,
                       0,
                       6,
                       true,
@@ -151,7 +182,16 @@ export default function Home() {
                   </dd>
                   <dt>Unlocked</dt>
                   <dd>
-                    {formatValue(position.unlocked, 0, 6, true, false, ' MARS', false, false)}
+                    {formatValue(
+                      allUnlocked ? position.total : position.unlocked,
+                      0,
+                      6,
+                      true,
+                      false,
+                      ' MARS',
+                      false,
+                      false,
+                    )}
                   </dd>
                   <dt>Withdrawable</dt>
                   <dd>
@@ -161,41 +201,47 @@ export default function Home() {
                   <dd>
                     {formatValue(position.withdrawn, 0, 6, true, false, ' MARS', false, false)}
                   </dd>
-                  <dt>Vesting Start Time</dt>
-                  <dd>{moment.unix(startTime).format('MMMM Do YYYY')}</dd>
-                  <dt>Vesting Cliff</dt>
-                  <dd>
-                    {moment.unix(startTime + position.vest_schedule.cliff).format('MMMM Do YYYY')}{' '}
-                    <span className='faded'>
-                      {formatValue(
-                        position.vest_schedule.cliff / 86400,
-                        0,
-                        0,
-                        true,
-                        '(',
-                        ' days)',
-                        true,
-                      )}
-                    </span>
-                  </dd>
-                  <dt>Vesting End</dt>
-                  <dd>
-                    {moment
-                      .unix(startTime + position.vest_schedule.duration)
-                      .format('MMMM Do YYYY')}{' '}
-                    <span className='faded'>
-                      {formatValue(
-                        position.vest_schedule.duration / 86400,
-                        0,
-                        0,
-                        true,
-                        '(',
-                        ' days)',
-                        true,
-                        false,
-                      )}
-                    </span>
-                  </dd>
+                  {allUnlocked && (
+                    <>
+                      <dt>Vesting Start Time</dt>
+                      <dd>{moment.unix(startTime).format('MMMM Do YYYY')}</dd>
+                      <dt>Vesting Cliff</dt>
+                      <dd>
+                        {moment
+                          .unix(startTime + position.vest_schedule.cliff)
+                          .format('MMMM Do YYYY')}{' '}
+                        <span className='faded'>
+                          {formatValue(
+                            position.vest_schedule.cliff / 86400,
+                            0,
+                            0,
+                            true,
+                            '(',
+                            ' days)',
+                            true,
+                          )}
+                        </span>
+                      </dd>
+                      <dt>Vesting End</dt>
+                      <dd>
+                        {moment
+                          .unix(startTime + position.vest_schedule.duration)
+                          .format('MMMM Do YYYY')}{' '}
+                        <span className='faded'>
+                          {formatValue(
+                            position.vest_schedule.duration / 86400,
+                            0,
+                            0,
+                            true,
+                            '(',
+                            ' days)',
+                            true,
+                            false,
+                          )}
+                        </span>
+                      </dd>
+                    </>
+                  )}
                 </dl>
               </div>
             )}
@@ -206,7 +252,13 @@ export default function Home() {
               </ul>
             )}
             <br />
-            <button className='button2' onClick={disconnect}>
+            <button
+              className='button2'
+              onClick={() => {
+                disconnect()
+                terminate()
+              }}
+            >
               Disconnect
             </button>
           </>
